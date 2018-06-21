@@ -1,5 +1,5 @@
 Function.prototype.ownCall = function(context) {
-  var context = context || global
+  context = context || global
   var prefix = 'own'
   var id = prefix + Math.random()
 
