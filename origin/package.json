@@ -10,5 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "jest": "^23.1.0"
+  },
+  "jest": {
+    "collectCoverage": true
   }
 }
