@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>data-binding-method-set</title>
+</head>
+<body>
+  <input type="text" id="input" q-value="value">
+  <span q-text="value" id="el"></span>
+
+  <script>
+    // 原理：
+    // 每次set modle value都执行一次scan
+    // scan遍历元素集合执行元素上的directive
+
+    let elems = [
+      document.getElementById('input'),
+      document.getElementById('el')
+    ]
+    let data = {
+      value: 'hello'
+    }
+
+    // 定义Directive
+    let directive = {
+      text: function(text) {
+        this.innerHTML = text
+      },
+      value: function(value) {
+        this.setAttribute('value', value)
+      }
+    }
+
+    function scan() {
+      for (let elem of elems) {
+        elem.directive = []
+        for (let attr of elem.attributes) {
+          let directiveName = attr.nodeName.slice(2)
+          if (attr.nodeName.indexOf('q-') >= 0) {
+            directive[directiveName].call(elem, data[attr.nodeValue]) 
+            elem.directive.push(directiveName)
+          }
+        }
+      }
+    }
+
+    function ViewModelSet(key, value) {
+      data[key] = value
+      scan()
+    }
+
+    // 数据绑定监听
+    elems[0].addEventListener('input', function(e) {
+      ViewModelSet('value', e.target.value)
+    })
+
+    // 开始扫描节点
+    scan()
+    // 设置页面2秒后自动改变数据更新视图
+    setTimeout(function() {
+      ViewModelSet('value', 'hello world')
+    }, 2000)
+  </script>
+</body>
+</html>

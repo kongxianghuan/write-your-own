@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>data-binding-dirty-check</title>
+</head>
+<body>
+  <input type="text" id="input" qg-event="value" qg-bind="value" >
+  <span id="el" qg-event="text" qg-bind="value"></span>
+
+  <script>
+    // 原理：
+    // 1.遍历带有qg-bind属性的元素
+    // 2.遍历元素属性获取qg-event类型，
+    //   对每个元素检测自身directive集合中qg-event类型的值与元素绑定数据模型的值是否相同
+    // 3.值不同执行对应qg-event类型指令函数，并存储到元素的directive属性中
+
+    let elems = [
+      document.getElementById('input'),
+      document.getElementById('el')
+    ]
+    let data = {
+      value: 'hello'
+    }
+
+    // 定义Directive
+    let directive = {
+      text: function(text) {
+        this.innerHTML = text
+      },
+      value: function(value) {
+        this.setAttribute('value', value)
+      }
+    }
+    
+    // 遍历元素初始化directive
+    function scan() {
+      for (let elem of elems) {
+        elem.directive = []
+      }
+    }
+    
+    // 获取所有qg-bind元素进行脏检查
+    function $digest(value) {
+      let list = document.querySelectorAll('[qg-bind='+ value +']')
+      digest(list)
+    }
+    
+    // 脏检查实现
+    function digest(elems) {
+      for (let i = 0, len = elems.length; i < len; i++) {
+        let elem = elems[i]
+        // 遍历元素属性
+        for (let j = 0, attrLen = elem.attributes.length; j < attrLen; j++) {
+          let attr = elem.attributes[j]
+          // 查找qg-event属性
+          if (attr.nodeName.indexOf('qg-event') >= 0) {
+            // 元素绑定的数据键名
+            let dataKey = elem.getAttribute('qg-bind') || undefined   
+            // 检测元素指令集中对应qg-event类型的值是否和数据模型中元素绑定的值是否相同
+            if (elem.directive[attr.nodeValue] !== data[dataKey]) {
+              // 执行对应qg-event类型的directive
+              directive[attr.nodeValue].call(elem, data[dataKey]) 
+              // 存储directive对应的数据
+              elem.directive[attr.nodeValue] = data[dataKey]
+            }
+          }
+        }
+      }
+    }
+
+    scan()
+    $digest('value')
+
+    elems[0].addEventListener('input', function(e) {
+      data.value = e.target.value
+      $digest(e.target.getAttribute('qg-bind'))
+    })
+  </script>
+</body>
+</html>

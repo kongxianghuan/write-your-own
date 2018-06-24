@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>data-binding-hijacking</title>
+</head>
+<body>
+  <input type="text" id="input" q-value="value">
+  <span q-text="value" id="el"></span>
+
+  <script>
+    // 原理：
+    // 通过defindProperty设置value的get和set
+    // 当设置value值时候出发set，在set中进行节点扫描执行directive
+
+    let elems = [
+      document.getElementById('input'),
+      document.getElementById('el')
+    ]
+    let data = {
+      value: 'hello'
+    }
+
+    // 定义Directive
+    let directive = {
+      text: function(text) {
+        this.innerHTML = text
+      },
+      value: function(value) {
+        this.setAttribute('value', value)
+      }
+    }
+
+    function scan() {
+      for (let elem of elems) {
+        elem.directive = []
+        for (let attr of elem.attributes) {
+          let directiveName = attr.nodeName.slice(2)
+          if (attr.nodeName.indexOf('q-') >= 0) {
+            directive[directiveName].call(elem, data[attr.nodeValue]) 
+            elem.directive.push(directiveName)
+          }
+        }
+      }
+    }
+
+    let bValue = data.value
+    function defineGetAndSet(obj, propName) {
+      Object.defineProperty(obj, propName, {
+        get: function() {
+          return bValue
+        },
+        set: function(newValue) {
+          bValue = newValue
+          scan() 
+        },
+        enumerable: true,
+        configurable: false
+      })
+    }
+
+    // 数据绑定监听
+    elems[0].addEventListener('input', function(e) {
+      data.value = e.target.value
+    })
+
+
+    // 绑定属性get和set并扫描
+    defineGetAndSet(data, 'value')
+    scan()
+  </script>
+</body>
+</html>

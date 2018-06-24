@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>data-binding-proxy</title>
+</head>
+<body>
+  <input type="text" id="input" q-value="value">
+  <span q-text="value" id="el"></span>
+
+  <script>
+    // 原理：
+    // 利用Proxy创建data，给data设置属性触发set时候
+    // scan扫描节点执行directive
+
+    let elems = [
+      document.getElementById('input'),
+      document.getElementById('el')
+    ]
+    let data = new Proxy({}, {
+      get: function(target, key, receiver) {
+        return target.value
+      },
+      set: function(target, key, value, receiver) {
+        target.value = value
+        scan()
+        return target.value
+      }
+    })
+
+    // 定义Directive
+    let directive = {
+      text: function(text) {
+        this.innerHTML = text
+      },
+      value: function(value) {
+        this.setAttribute('value', value)
+      }
+    }
+
+    function scan() {
+      for (let elem of elems) {
+        elem.directive = []
+        for (let attr of elem.attributes) {
+          let directiveName = attr.nodeName.slice(2)
+          if (attr.nodeName.indexOf('q-') >= 0) {
+            directive[directiveName].call(elem, data[attr.nodeValue]) 
+            elem.directive.push(directiveName)
+          }
+        }
+      }
+    }
+
+    // 数据绑定监听
+    elems[0].addEventListener('input', function(e) {
+      data.value = e.target.value
+    })
+
+
+    // 绑定属性get和set并扫描
+    data['value'] = 'hello world'
+  </script>
+</body>
+</html>
