@@ -1,3 +1,9 @@
+/**
+ * 
+ * @param {Function} fn 
+ * @param {number} wait 
+ * @param {Boolean} immediate 是否马上触发
+ */
 module.exports = (fn, wait, immediate) => {
   let timeout = null
   let res = null

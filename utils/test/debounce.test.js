@@ -27,7 +27,7 @@ test('debounce cancel', () => {
   expect(test).toHaveBeenCalledTimes(0)
 })
 
-test('debounce cancel', () => {
+test('debounce immediate', () => {
   let test = jest.fn()
   let debounced = debounce(test, 1000, true)
 
