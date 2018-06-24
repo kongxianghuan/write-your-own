@@ -19,7 +19,6 @@ module.exports = function throttle(fn, wait, options = {}) {
 
   let throttled = function() {
     let now = new Date().getTime()
-    // leading为false函数不马上触发
     if (!previous && options.leading === false) {
       previous = now
     }
