@@ -10,6 +10,9 @@ exports.shallowCopy = (obj) => {
   return newObj
 }
 
+// 简单深拷贝
+exports.jsonDeepClone = (obj) => JSON.parse(JSON.stringify(obj))
+
 // 深拷贝
 const deepClone = (obj) => {
   if (typeof obj !== 'object') return
