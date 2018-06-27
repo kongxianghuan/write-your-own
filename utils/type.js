@@ -98,3 +98,9 @@ exports.isArrayLike = (obj) => {
 
 // 判断是否为DOM元素
 exports.isElement = (obj) => !!(obj && obj.nodeType === 1)
+
+// 判断是否为函数
+exports.isFunction = (obj) => type(obj) === 'function'
+
+// 判断是否为数组
+exports.isArray = (obj) => type(obj) === 'array'

@@ -1,7 +1,4 @@
-const { type, isPlainObject } = require('./type')
-
-const isFunction = (obj) => type(obj) === 'function'
-const isArray = (obj) => type(obj) === 'array'
+const { type, isPlainObject, isFunction, isArray } = require('./type')
 
 function extend() {
   // 默认不进行深拷贝
