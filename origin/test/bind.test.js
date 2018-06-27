@@ -1,3 +1,5 @@
+require('../bind')
+
 var foo = { value: 1 }
 
 function bar(name, age) {
@@ -7,7 +9,7 @@ function bar(name, age) {
 }
 bar.prototype.friend = 'kevin'
 
-var bindFoo = bar.bind(foo, 'daisy')
+var bindFoo = bar.ownBind(foo, 'daisy')
 
 test('Fn bind test', () => {
   bindFoo(20)
