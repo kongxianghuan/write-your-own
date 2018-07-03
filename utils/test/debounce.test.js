@@ -1,6 +1,6 @@
 jest.useFakeTimers()
 
-const debounce = require('../debounce')
+const { debounce } = require('../debounce')
 
 test('debounce test', () => {
   let test = jest.fn()

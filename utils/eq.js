@@ -101,3 +101,5 @@ function deepEq(a, b, aStack, bStack) {
   bStack.pop()
   return true
 }
+
+module.exports = eq

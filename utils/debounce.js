@@ -4,7 +4,7 @@
  * @param {number} wait 
  * @param {Boolean} immediate 是否马上触发
  */
-module.exports = (fn, wait, immediate) => {
+exports.debounce = (fn, wait, immediate) => {
   let timeout = null
   let res = null
 
@@ -32,4 +32,12 @@ module.exports = (fn, wait, immediate) => {
   }
 
   return debounced
+}
+
+exports.rafDebounce = (fn) => {
+  let timer = null
+  return () => {
+    cancelAnimationFrame(timer)
+    timer = requestAnimationFrame(fn)
+  }
 }
